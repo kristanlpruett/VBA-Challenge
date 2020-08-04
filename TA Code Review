@@ -1,0 +1,107 @@
+Sub stocks()
+
+Application.ScreenUpdating = False
+
+Dim ws As Worksheet
+Dim ticker As String
+Dim yearly_open As Double
+Dim yearly_close As Double
+Dim yearly_change As Double
+Dim percent_change As Double
+Dim stock_volume As Double
+Dim summary_row As Integer
+
+
+
+For Each ws In ThisWorkbook.Worksheets
+    ws.Range("H1").Value = "Ticker"
+    ws.Range("I1").Value = "Yearly Change"
+    ws.Range("J1").Value = "Percent Change"
+    ws.Range("K1").Value = "Total Stock Volume"
+    
+    LastRow = ws.Cells(Rows.Count, 1).End(xlUp).Row
+    
+    summary_row = 2
+    yearly_open = ws.Cells(2, 3).Value
+    
+    For i = 2 To LastRow
+        
+        stock_volume = stock_volume + ws.Cells(i, 7)
+        
+        If ws.Cells(i, 1).Value <> ws.Cells(i + 1, 1).Value Then
+        
+        ws.Cells(summary_row, 8).Value = ws.Cells(i, 1)
+        ws.Cells(summary_row, 11).Value = stock_volume
+        stock_volume = 0
+        
+        
+        yearly_close = ws.Cells(i, 6).Value
+        yearly_change = yearly_close - yearly_open
+        If yearly_open > 0 Then
+        percent_change = yearly_change * 100 / yearly_open
+        Else
+        percent_change = 0
+        End If
+        ws.Cells(summary_row, 10).Value = percent_change
+        ws.Cells(summary_row, 9).Value = yearly_change
+        yearly_open = ws.Cells(i + 1, 3).Value
+        
+    
+        
+        summary_row = summary_row + 1
+        
+        End If
+        
+        If ws.Cells(i, 9) > 0 Then
+        ws.Cells(i, 9).Interior.ColorIndex = 4
+        End If
+        
+        If ws.Cells(i, 9) < 0 Then
+        ws.Cells(i, 9).Interior.ColorIndex = 3
+        End If
+        
+        ws.Range("O1").Value = "Ticker"
+        ws.Range("P1").Value = "Value"
+        ws.Range("N2").Value = "Greatest % Increase"
+        ws.Range("N3").Value = "Greatest % Decrease"
+        ws.Range("N4").Value = "Greatest Total Volume"
+        
+        greatest_increase = -1000
+        greatest_decrease = 1000
+        greatest_volume = 0
+
+                If Cells(i, 10).Value > greatest_increase Then
+                greatest_increase = Cells(i, 10).Value
+                greatest_increase_ticker = Cells(i, 8).Value
+            End If
+
+            If Cells(i, 10).Value < greatest_decrease Then
+                greatest_decrease = Cells(i, 10).Value
+                greatest_decrease_ticker = Cells(i, 8).Value
+            End If
+
+            If Cells(i, 11).Value > greatest_volume Then
+                greatest_volume = Cells(i, 11).Value
+                greatest_volume_ticker = Cells(i, 8).Value
+            End If
+       
+        Cells(2, 15).Value = greatest_increase_ticker
+        Cells(3, 15).Value = greatest_decrease_ticker
+        Cells(4, 15).Value = greatest_volume_ticker
+
+        
+        Cells(2, 16).Value = greatest_increase
+        Cells(2, 16).NumberFormat = "0.00%"
+        Cells(3, 16).Value = greatest_decrease
+        Cells(3, 16).NumberFormat = "0.00%"
+        Cells(4, 16).Value = greastest_volume
+        
+        
+    Next i
+    
+    Next ws
+    MsgBox ("Finished!")
+
+Application.ScreenUpdating = True
+
+End Sub
